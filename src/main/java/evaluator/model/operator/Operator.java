@@ -1,4 +1,4 @@
-package parser.model.operator;
+package evaluator.model.operator;
 
 public interface Operator {
 

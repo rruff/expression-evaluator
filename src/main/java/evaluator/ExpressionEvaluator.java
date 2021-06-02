@@ -1,5 +1,8 @@
 package evaluator;
 
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import java.util.Deque;
 import java.util.LinkedList;
 import java.util.List;
@@ -15,7 +18,12 @@ public class ExpressionEvaluator {
     
     private OperatorFactory operatorFactory;
 
+    public ExpressionEvaluator(OperatorFactory operatorFactory) {
+        this.operatorFactory = operatorFactory;
+    }
+
     public int evaluate(String expr) {
+        checkNotNull(expr);
         List<Character> chars = expr.chars().mapToObj(c -> (char)c).collect(Collectors.toList());
         Deque<Operator> operatorStack = new LinkedList<>();
         Deque<Integer> valueStack = new LinkedList<>();
