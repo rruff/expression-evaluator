@@ -37,10 +37,14 @@ public enum MathOperator implements Operator {
     }
     
     public static Operator fromChar(char c) {
-        if (!operators.keySet().contains(c)) {
+        if (!isOperator(c)) {
             throw new IllegalArgumentException(String.format("%s is not a valid operator", c));
         }
         return operators.get(c);
+    }
+
+    public static boolean isOperator(char c) {
+        return operators.keySet().contains(c);
     }
 
     private final char symbol;

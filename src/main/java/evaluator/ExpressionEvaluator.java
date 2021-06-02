@@ -7,19 +7,13 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import evaluator.model.operator.MathOperator;
 import evaluator.model.operator.Operator;
-import evaluator.model.operator.OperatorFactory;
 
 /**
  *  Evaluates a mathematical expression.
  */
 public class ExpressionEvaluator {
-    
-    private OperatorFactory operatorFactory;
-
-    public ExpressionEvaluator(OperatorFactory operatorFactory) {
-        this.operatorFactory = operatorFactory;
-    }
 
     public int evaluate(String expr) {
         checkNotNull(expr);
@@ -28,8 +22,8 @@ public class ExpressionEvaluator {
         Deque<Integer> valueStack = new LinkedList<>();
 
         for (char c : chars) {
-            if (operatorFactory.isOperator(c)) {
-                operatorStack.push(operatorFactory.getInstance(c));
+            if (MathOperator.isOperator(c)) {
+                operatorStack.push(MathOperator.fromChar(c));
             } else if (Character.isDigit(c)) {
                 valueStack.push(Integer.valueOf(String.valueOf(c)));
             } else {
