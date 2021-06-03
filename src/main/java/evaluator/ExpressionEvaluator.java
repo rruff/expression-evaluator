@@ -1,35 +1,69 @@
 package evaluator;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static evaluator.model.operator.MathOperator.isOperator;
 
 import java.util.Deque;
 import java.util.LinkedList;
-import java.util.List;
-import java.util.stream.Collectors;
 
 import evaluator.model.operator.MathOperator;
-import evaluator.model.operator.Operator;
 
 /**
  *  Evaluates a mathematical expression.
  */
 public class ExpressionEvaluator {
 
+    private static final char LEFT_PAREN = '(';
+    private static final char RIGHT_PAREN = ')';
+
     public int evaluate(String expr) {
         checkNotNull(expr);
-        List<Character> chars = expr.chars().mapToObj(c -> (char)c).collect(Collectors.toList());
-        Deque<Operator> operatorStack = new LinkedList<>();
+        Deque<Character> operatorStack = new LinkedList<>();
         Deque<Integer> valueStack = new LinkedList<>();
 
-        for (char c : chars) {
-            if (MathOperator.isOperator(c)) {
-                operatorStack.push(MathOperator.fromChar(c));
+        expr.chars().filter(c -> !Character.isWhitespace(c)).mapToObj(c -> (char)c).forEach(c -> {
+            if (isOperator(c)) {
+                if (!operatorStack.isEmpty()) {
+                    char op = operatorStack.peek();
+                    if (!isParenthesis(op) && MathOperator.fromChar(op).compareTo(MathOperator.fromChar(c)) >= 0) {
+                        op = operatorStack.pop();
+                        valueStack.push(evaluateSubExpression(op, valueStack));
+                    }
+                }
+                operatorStack.push(c);
             } else if (Character.isDigit(c)) {
                 valueStack.push(Integer.valueOf(String.valueOf(c)));
-            } else {
+            } else if (c == LEFT_PAREN) {
+                operatorStack.push(c);
+            } else if (c == RIGHT_PAREN) {
+                char op = operatorStack.peek();
+                if (op != LEFT_PAREN) {
+                    op = operatorStack.pop();
+                    valueStack.push(evaluateSubExpression(op, valueStack));
+                }
+                // Discard the left paren
+                operatorStack.pop();
+            }
+            else {
                 throw new IllegalArgumentException(String.format("Invalid character: %s", c));
             }
+        });
+
+        while (!operatorStack.isEmpty()) {
+            char op = operatorStack.pop();
+            valueStack.push(evaluateSubExpression(op, valueStack));
         }
-        return 0;
+
+        return valueStack.pop();
+    }
+
+    private int evaluateSubExpression(char op, Deque<Integer> valueStack) {
+        int right = valueStack.pop();
+        int left = valueStack.pop();
+        return MathOperator.fromChar(op).execute(left, right);
+    }
+
+    private boolean isParenthesis(char c) {
+        return c == LEFT_PAREN || c == RIGHT_PAREN;
     }
 }

@@ -4,28 +4,29 @@ import java.util.HashMap;
 import java.util.Map;
 
 public enum MathOperator implements Operator {
-    
-    ADDITION('+') {
-        public int execute(int left, int right) {
-            return left + right;
-        }
-    },
 
     SUBTRACTION('-') {
         public int execute(int left, int right) {
             return left - right;
         }
     },
-
-    MULTIPLICATION('*') {
+    
+    ADDITION('+') {
+        @Override
         public int execute(int left, int right) {
-            return left * right;
+            return left + right;
         }
     },
-
+    
     DIVISION('/') {
         public int execute(int left, int right) {
             return left / right;
+        }
+    },
+    
+    MULTIPLICATION('*') {
+        public int execute(int left, int right) {
+            return left * right;
         }
     };
 
@@ -36,7 +37,7 @@ public enum MathOperator implements Operator {
         }
     }
     
-    public static Operator fromChar(char c) {
+    public static MathOperator fromChar(char c) {
         if (!isOperator(c)) {
             throw new IllegalArgumentException(String.format("%s is not a valid operator", c));
         }
