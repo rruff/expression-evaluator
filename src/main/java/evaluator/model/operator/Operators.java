@@ -6,7 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Supplier;
 
-public class Operators {
+public final class Operators {
     private static final Map<Character, Supplier<Operator>> OPERATORS = new HashMap<>();
     static {
         OPERATORS.put('+', Addition::new);
@@ -25,7 +25,7 @@ public class Operators {
         return OPERATORS.keySet().contains(c);
     }
 
-    private static abstract class AbstractOperator implements Operator, Comparable<Operator> {
+    private static abstract class AbstractOperator implements Operator {
         
         private final int precedence;
 

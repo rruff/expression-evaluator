@@ -26,21 +26,18 @@ public class OperatorsTest {
 
     @Test
     public void testPower() {
-        Operator pow = Operators.of('^');
-        assertEquals(27, pow.execute(3, 3));
-        assertEquals(81, pow.execute(9, 2));
+        assertEquals(27, Operators.of('^').execute(3, 3));
+        assertEquals(81, Operators.of('^').execute(9, 2));
     }
 
     @Test
     public void testMultiplication() {
-        Operator multiply = Operators.of('*');
-        assertEquals(69, multiply.execute(3, 23));
+        assertEquals(69, Operators.of('*').execute(3, 23));
     }
 
     @Test
     public void testDivision() {
-        Operator divide = Operators.of('/');
-        assertEquals(69, divide.execute(207, 3));
+        assertEquals(69, Operators.of('/').execute(207, 3));
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -50,13 +47,11 @@ public class OperatorsTest {
 
     @Test
     public void testAddition() {
-        Operator add = Operators.of('+');
-        assertEquals(69, add.execute(62, 7));
+        assertEquals(69, Operators.of('+').execute(62, 7));
     }
 
     @Test
     public void testSubtraction() {
-        Operator subtract = Operators.of('-');
-        assertEquals(69, subtract.execute(78, 9));
+        assertEquals(69, Operators.of('-').execute(78, 9));
     }
 }

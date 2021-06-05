@@ -9,8 +9,13 @@ import java.util.LinkedList;
 import evaluator.model.operator.Operators;
 
 /**
- *  Evaluates a mathematical expression by reading tokens from a character array. Limited to +, -
- *  *, / and ^ (exponent).
+ *  Evaluates an infix mathematical expression by reading tokens from a character array. Limited to +, -
+ *  *, /, ^ (exponent) and parenthesised sub-expressions.
+ * 
+ * This is an implementation of the 
+ * <a href="https://en.wikipedia.org/wiki/Shunting-yard_algorithm">Shunting-yard Algorithm</a>,
+ * adapted to produce the result rather than convert the expression to RPN. The adapted algorithm is
+ * described here: {@link https://www.geeksforgeeks.org/expression-evaluation/}.
  */
 public class CharArrayExpressionEvaluator implements ExpressionEvaluator {
 
@@ -34,8 +39,7 @@ public class CharArrayExpressionEvaluator implements ExpressionEvaluator {
                 if (!operatorStack.isEmpty()) {
                     char op = operatorStack.peek();
                     if (!isParenthesis(op) && Operators.of(op).precedes(Operators.of(t))) {
-                        op = operatorStack.pop();
-                        valueStack.push(evaluateSubExpression(op, valueStack));
+                        valueStack.push(evaluateSubExpression(operatorStack.pop(), valueStack));
                     }
                 }
                 operatorStack.push(t);
@@ -44,7 +48,7 @@ public class CharArrayExpressionEvaluator implements ExpressionEvaluator {
                 int digits = 0;
                 int j = i;
                 while (j < tokens.length && isDigit(tokens[j])) {
-                    digits = digits * 10 + asInt(tokens[j]);
+                    digits = combineDigits(digits, tokens[j]);
                     j++;
                 }
                 valueStack.push(digits);
@@ -54,10 +58,8 @@ public class CharArrayExpressionEvaluator implements ExpressionEvaluator {
             } else if (t == RIGHT_PAREN) {
                 // Encountered closing parenthesis, so
                 // solve the parenthesised expression.
-                char op = operatorStack.peek();
-                if (op != LEFT_PAREN) {
-                    op = operatorStack.pop();
-                    valueStack.push(evaluateSubExpression(op, valueStack));
+                if (operatorStack.peek() != LEFT_PAREN) {
+                    valueStack.push(evaluateSubExpression(operatorStack.pop(), valueStack));
                 }
                 // Discard the left parenthesis
                 operatorStack.pop();
@@ -67,15 +69,25 @@ public class CharArrayExpressionEvaluator implements ExpressionEvaluator {
         }
 
         while (!operatorStack.isEmpty()) {
-            char op = operatorStack.pop();
-            valueStack.push(evaluateSubExpression(op, valueStack));
+            valueStack.push(evaluateSubExpression(operatorStack.pop(), valueStack));
         }
 
         return valueStack.pop();
     }
 
-    private int asInt(char c) {
-        return Character.getNumericValue(c);
+    /**
+     * Combines single digits into a number represented by multiple digits.
+     * 
+     * Example:
+     * <blockquote>
+     *      <pre>int result = combineDigits(5, '7'); // result = 57</pre>
+     * </blockquote>
+     * @param n the number to append the digit character to.
+     * @param digit a numeric character.
+     * @return the resulting number.
+     */
+    private int combineDigits(int n, char digit) {
+        return n * 10 + Character.getNumericValue(digit);
     }
 
     private int evaluateSubExpression(char op, Deque<Integer> valueStack) {

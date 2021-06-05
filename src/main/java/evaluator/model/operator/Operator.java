@@ -1,6 +1,6 @@
 package evaluator.model.operator;
 
-public interface Operator {
+public interface Operator extends Comparable<Operator> {
 
     /**
      * Execute this operation on the left and right operands.
