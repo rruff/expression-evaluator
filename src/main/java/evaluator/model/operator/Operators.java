@@ -82,6 +82,7 @@ public class Operators {
 
         @Override
         public int execute(int left, int right) {
+            checkArgument(right != 0, "Cannot divide by 0");
             return left / right;
         }
     }
