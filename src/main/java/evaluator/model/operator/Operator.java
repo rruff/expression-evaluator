@@ -11,11 +11,11 @@ public interface Operator {
     int execute(int left, int right);
 
     int getPrecedence();
-    
+
     /**
      * Returns true if this operator has higher precedence than, or equal to, {@code other}, else false.
      * @param other the Operator instance to compare.
      * @return true if this operator has higher precedence than, or equal to, {@code other}, else false.
      */
-    boolean isHigherPrecedenceThan(Operator other);
+    boolean precedes(Operator other);
 }

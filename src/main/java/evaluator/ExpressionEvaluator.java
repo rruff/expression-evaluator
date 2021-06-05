@@ -20,18 +20,27 @@ public class ExpressionEvaluator {
         Deque<Character> operatorStack = new LinkedList<>();
         Deque<Integer> valueStack = new LinkedList<>();
 
+        char[] chars = expr.toCharArray();
+        for (int i = 0; i < chars.length; i++) {
+            char c = chars[i];
+            if (Character.isWhitespace(c)) {
+                continue;
+            }
+        }
+
         expr.chars().filter(c -> !Character.isWhitespace(c)).mapToObj(c -> (char)c).forEach(c -> {
             if (Operators.isOperator(c)) {
                 if (!operatorStack.isEmpty()) {
                     char op = operatorStack.peek();
-                    if (!isParenthesis(op) && Operators.of(op).isHigherPrecedenceThan(Operators.of(c))) {
+                    if (!isParenthesis(op) && Operators.of(op).precedes(Operators.of(c))) {
                         op = operatorStack.pop();
                         valueStack.push(evaluateSubExpression(op, valueStack));
                     }
                 }
                 operatorStack.push(c);
             } else if (Character.isDigit(c)) {
-                valueStack.push(Integer.valueOf(String.valueOf(c)));
+                int digit = Character.getNumericValue(c);
+                valueStack.push(digit);
             } else if (c == LEFT_PAREN) {
                 operatorStack.push(c);
             } else if (c == RIGHT_PAREN) {

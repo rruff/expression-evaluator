@@ -13,6 +13,7 @@ public class Operators {
         OPERATORS.put('-', Subtraction::new);
         OPERATORS.put('*', Multiplication::new);
         OPERATORS.put('/', Division::new);
+        OPERATORS.put('^', Power::new);
     }
     
     public static Operator of(char c) {
@@ -43,8 +44,20 @@ public class Operators {
         }
 
         @Override
-        public boolean isHigherPrecedenceThan(Operator other) {
-            return compareTo(other) > 0;
+        public boolean precedes(Operator other) {
+            return compareTo(other) >= 0;
+        }
+    }
+
+    private static class Power extends AbstractOperator {
+        
+        Power() {
+            super(32);
+        }
+
+        @Override
+        public int execute(int left, int right) {
+            return (int) Math.pow((double)left, (double)right);
         }
     }
 

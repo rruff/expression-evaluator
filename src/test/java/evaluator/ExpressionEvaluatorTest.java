@@ -36,4 +36,12 @@ public class ExpressionEvaluatorTest {
         int actual = expressionEvaluator.evaluate("3 + 3 * 7 / (2 + 1)");
         assertEquals(10, actual);
     }
+
+    @Test
+    public void testNumericValue() {
+        char[] chars = new char[] {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9'};
+        for (int i = 0; i < 10; i++) {
+            assertEquals(i, Character.getNumericValue(chars[i]));
+        }
+    }
 }
