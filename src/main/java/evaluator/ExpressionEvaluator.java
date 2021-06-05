@@ -1,12 +1,11 @@
 package evaluator;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static evaluator.model.operator.MathOperator.isOperator;
 
 import java.util.Deque;
 import java.util.LinkedList;
 
-import evaluator.model.operator.MathOperator;
+import evaluator.model.operator.Operators;
 
 /**
  *  Evaluates a mathematical expression.
@@ -22,10 +21,10 @@ public class ExpressionEvaluator {
         Deque<Integer> valueStack = new LinkedList<>();
 
         expr.chars().filter(c -> !Character.isWhitespace(c)).mapToObj(c -> (char)c).forEach(c -> {
-            if (isOperator(c)) {
+            if (Operators.isOperator(c)) {
                 if (!operatorStack.isEmpty()) {
                     char op = operatorStack.peek();
-                    if (!isParenthesis(op) && MathOperator.fromChar(op).compareTo(MathOperator.fromChar(c)) >= 0) {
+                    if (!isParenthesis(op) && Operators.of(op).isHigherPrecedenceThan(Operators.of(c))) {
                         op = operatorStack.pop();
                         valueStack.push(evaluateSubExpression(op, valueStack));
                     }
@@ -60,7 +59,7 @@ public class ExpressionEvaluator {
     private int evaluateSubExpression(char op, Deque<Integer> valueStack) {
         int right = valueStack.pop();
         int left = valueStack.pop();
-        return MathOperator.fromChar(op).execute(left, right);
+        return Operators.of(op).execute(left, right);
     }
 
     private boolean isParenthesis(char c) {
