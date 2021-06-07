@@ -38,8 +38,9 @@ public class CharArrayExpressionEvaluator implements ExpressionEvaluator {
             if (Operators.isOperator(t)) {
                 if (!operatorStack.isEmpty()) {
                     char op = operatorStack.peek();
-                    if (!isParenthesis(op) && Operators.of(op).precedes(Operators.of(t))) {
-                        valueStack.push(evaluateSubExpression(operatorStack.pop(), valueStack));
+                    if (!isParenthesis(op) && 
+                            Operators.fromChar(op).compareTo(Operators.fromChar(t)) >= 0) {
+                        valueStack.push(evaluate(operatorStack, valueStack));
                     }
                 }
                 operatorStack.push(t);
@@ -59,7 +60,7 @@ public class CharArrayExpressionEvaluator implements ExpressionEvaluator {
                 // Encountered closing parenthesis, so
                 // solve the parenthesised expression.
                 if (operatorStack.peek() != LEFT_PAREN) {
-                    valueStack.push(evaluateSubExpression(operatorStack.pop(), valueStack));
+                    valueStack.push(evaluate(operatorStack, valueStack));
                 }
                 // Discard the left parenthesis
                 operatorStack.pop();
@@ -69,7 +70,7 @@ public class CharArrayExpressionEvaluator implements ExpressionEvaluator {
         }
 
         while (!operatorStack.isEmpty()) {
-            valueStack.push(evaluateSubExpression(operatorStack.pop(), valueStack));
+            valueStack.push(evaluate(operatorStack, valueStack));
         }
 
         return valueStack.pop();
@@ -90,10 +91,10 @@ public class CharArrayExpressionEvaluator implements ExpressionEvaluator {
         return n * 10 + Character.getNumericValue(digit);
     }
 
-    private int evaluateSubExpression(char op, Deque<Integer> valueStack) {
-        int right = valueStack.pop();
-        int left = valueStack.pop();
-        return Operators.of(op).execute(left, right);
+    private int evaluate(Deque<Character> operatorStack, Deque<Integer> valStack) {
+        int right = valStack.pop();
+        int left = valStack.pop();
+        return Operators.fromChar(operatorStack.pop()).apply(left, right);
     }
 
     private boolean isParenthesis(char c) {
