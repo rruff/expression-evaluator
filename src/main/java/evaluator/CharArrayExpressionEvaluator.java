@@ -38,8 +38,7 @@ public class CharArrayExpressionEvaluator implements ExpressionEvaluator {
             if (Operators.isOperator(t)) {
                 if (!operatorStack.isEmpty()) {
                     char op = operatorStack.peek();
-                    if (!isParenthesis(op) && 
-                            Operators.fromChar(op).compareTo(Operators.fromChar(t)) >= 0) {
+                    if (!isParenthesis(op) && precedes(op, t)) {
                         valueStack.push(evaluate(operatorStack, valueStack));
                     }
                 }
@@ -83,18 +82,28 @@ public class CharArrayExpressionEvaluator implements ExpressionEvaluator {
      * <blockquote>
      *      <pre>int result = combineDigits(5, '7'); // result = 57</pre>
      * </blockquote>
-     * @param n the number to append the digit character to.
+     * @param acc the accumulator that will hold the final number.
      * @param digit a numeric character.
      * @return the resulting number.
      */
-    private int combineDigits(int n, char digit) {
-        return n * 10 + Character.getNumericValue(digit);
+    private int combineDigits(int acc, char digit) {
+        return acc * 10 + Character.getNumericValue(digit);
     }
 
     private int evaluate(Deque<Character> operatorStack, Deque<Integer> valStack) {
         int right = valStack.pop();
         int left = valStack.pop();
         return Operators.fromChar(operatorStack.pop()).apply(left, right);
+    }
+
+    /**
+     * Returns true if {@code op1} has precedence over {@code op2}.
+     * @param op1 the left operator in the comparison.
+     * @param op2 the right operator in the comparison.
+     * @return true if {@code op1} has precedence over {@code op2}.
+     */
+    private boolean precedes(char op1, char op2) {
+        return Operators.fromChar(op1).compareTo(Operators.fromChar(op2)) > 0;
     }
 
     private boolean isParenthesis(char c) {
