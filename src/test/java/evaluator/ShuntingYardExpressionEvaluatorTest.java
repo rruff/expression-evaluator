@@ -5,13 +5,13 @@ import static org.junit.Assert.assertEquals;
 import org.junit.Before;
 import org.junit.Test;
 
-public class CharArrayExpressionEvaluatorTest {
+public class ShuntingYardExpressionEvaluatorTest {
 
     private ExpressionEvaluator expressionEvaluator;
 
     @Before
     public void setUp() {
-        expressionEvaluator = new CharArrayExpressionEvaluator();
+        expressionEvaluator = new ShuntingYardExpressionEvaluator();
     }
 
     @Test(expected = IllegalArgumentException.class)

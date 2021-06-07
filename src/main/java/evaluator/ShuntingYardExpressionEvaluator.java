@@ -17,7 +17,7 @@ import evaluator.model.operator.Operators;
  * adapted to produce the result rather than convert the expression to RPN. The adapted algorithm is
  * described here: {@link https://www.geeksforgeeks.org/expression-evaluation/}.
  */
-public class CharArrayExpressionEvaluator implements ExpressionEvaluator {
+public class ShuntingYardExpressionEvaluator implements ExpressionEvaluator {
 
     private static final char LEFT_PAREN = '(';
     private static final char RIGHT_PAREN = ')';
@@ -36,13 +36,7 @@ public class CharArrayExpressionEvaluator implements ExpressionEvaluator {
             }
 
             if (Operators.isOperator(t)) {
-                if (!operatorStack.isEmpty()) {
-                    char op = operatorStack.peek();
-                    if (!isParenthesis(op) && precedes(op, t)) {
-                        valueStack.push(evaluate(operatorStack, valueStack));
-                    }
-                }
-                operatorStack.push(t);
+                handleOperator(t, operatorStack, valueStack);
             } else if (isDigit(t)) {
                 // Handle numbers with multiple digits.
                 int digits = 0;
@@ -73,6 +67,16 @@ public class CharArrayExpressionEvaluator implements ExpressionEvaluator {
         }
 
         return valueStack.pop();
+    }
+
+    private void handleOperator(char op, Deque<Character> operatorStack, Deque<Integer> valueStack) {
+        if (!operatorStack.isEmpty()) {
+            char opOnStack = operatorStack.peek();
+            if (!isParenthesis(opOnStack) && precedes(opOnStack, op)) {
+                valueStack.push(evaluate(operatorStack, valueStack));
+            }
+        }
+        operatorStack.push(op);
     }
 
     /**
