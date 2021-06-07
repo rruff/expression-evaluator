@@ -36,17 +36,10 @@ public class ShuntingYardExpressionEvaluator implements ExpressionEvaluator {
             }
 
             if (Operators.isOperator(t)) {
-                handleOperator(t, operatorStack, valueStack);
+                consumeOperator(t, operatorStack, valueStack);
             } else if (isDigit(t)) {
-                // Handle numbers with multiple digits.
-                int digits = 0;
-                int j = i;
-                while (j < tokens.length && isDigit(tokens[j])) {
-                    digits = combineDigits(digits, tokens[j]);
-                    j++;
-                }
-                valueStack.push(digits);
-                i = j - 1; // Set i to the correct position
+                int position = consumeDigits(tokens, i, valueStack);
+                i = position - 1; // Set i to the correct position
             } else if (t == LEFT_PAREN) {
                 operatorStack.push(t);
             } else if (t == RIGHT_PAREN) {
@@ -69,7 +62,7 @@ public class ShuntingYardExpressionEvaluator implements ExpressionEvaluator {
         return valueStack.pop();
     }
 
-    private void handleOperator(char op, Deque<Character> operatorStack, Deque<Integer> valueStack) {
+    private void consumeOperator(char op, Deque<Character> operatorStack, Deque<Integer> valueStack) {
         if (!operatorStack.isEmpty()) {
             char opOnStack = operatorStack.peek();
             if (!isParenthesis(opOnStack) && precedes(opOnStack, op)) {
@@ -77,6 +70,28 @@ public class ShuntingYardExpressionEvaluator implements ExpressionEvaluator {
             }
         }
         operatorStack.push(op);
+    }
+
+    /**
+     * Handles a digit token encountered in the array. It will keep consuming characters until something
+     * other than a digit is encountered. Digit characers are combined into a single integer, and then pushed on
+     * the value stack.
+     * 
+     * <p>Returns the current position in the {@code tokens} array after all consecutive digits have been consumed.</p>
+     * @param tokens the array of tokens
+     * @param currentPosition the current position in {@code tokens} when the method is called.
+     * @param valueStack the stack of integers
+     * @return the current position in the {@code tokens} array after all consecutive digits have been consumed.
+     */
+    private int consumeDigits(char[] tokens, int currentPosition, Deque<Integer> valueStack) {
+        int digits = 0;
+        int j = currentPosition;
+        while (j < tokens.length && isDigit(tokens[j])) {
+            digits = combineDigits(digits, tokens[j]);
+            j++;
+        }
+        valueStack.push(digits);
+        return j;
     }
 
     /**
@@ -97,7 +112,11 @@ public class ShuntingYardExpressionEvaluator implements ExpressionEvaluator {
     private int evaluate(Deque<Character> operatorStack, Deque<Integer> valStack) {
         int right = valStack.pop();
         int left = valStack.pop();
-        return Operators.fromChar(operatorStack.pop()).apply(left, right);
+        return evaluate(operatorStack.pop(), left, right);
+    }
+
+    private int evaluate(char op, int left, int right) {
+        return Operators.fromChar(op).apply(left, right);
     }
 
     /**
