@@ -7,7 +7,7 @@ import java.util.function.BinaryOperator;
  * 
  * @param <T> the type of the operands and the result.
  */
-public interface OrderedOperator<T> extends BinaryOperator<T>, Comparable<OrderedOperator<Integer>> {
+public interface OrderedOperator<T> extends BinaryOperator<T>, Comparable<OrderedOperator<T>> {
     
     /**
      * Returns the character that this operator represent.
