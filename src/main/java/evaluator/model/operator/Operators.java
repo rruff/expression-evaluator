@@ -59,7 +59,7 @@ public final class Operators {
             checkArgument(isOperator(o1), "%s is not a valid operator", o1);
             checkArgument(isOperator(o2), "%s is not a valid operator", o1);
 
-            return precedenceMap.get(o1) - precedenceMap.get(o2);
+            return Integer.compare(precedenceMap.get(o1), precedenceMap.get(o2));
         }
     }
 }
