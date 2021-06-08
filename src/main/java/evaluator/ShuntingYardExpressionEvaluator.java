@@ -46,7 +46,9 @@ public class ShuntingYardExpressionEvaluator implements ExpressionEvaluator {
                 // Encountered closing parenthesis, so
                 // solve the parenthesised expression.
                 if (operatorStack.peek() != LEFT_PAREN) {
-                    valueStack.push(evaluate(operatorStack, valueStack));
+                    int right = valueStack.pop();
+                    int left = valueStack.pop();
+                    valueStack.push(evaluate(operatorStack.pop(), left, right));
                 }
                 // Discard the left parenthesis
                 operatorStack.pop();
@@ -56,7 +58,9 @@ public class ShuntingYardExpressionEvaluator implements ExpressionEvaluator {
         }
 
         while (!operatorStack.isEmpty()) {
-            valueStack.push(evaluate(operatorStack, valueStack));
+            int right = valueStack.pop();
+            int left = valueStack.pop();
+            valueStack.push(evaluate(operatorStack.pop(), left, right));
         }
 
         return valueStack.pop();
@@ -65,8 +69,10 @@ public class ShuntingYardExpressionEvaluator implements ExpressionEvaluator {
     private void consumeOperator(char op, Deque<Character> operatorStack, Deque<Integer> valueStack) {
         if (!operatorStack.isEmpty()) {
             char opOnStack = operatorStack.peek();
-            if (!isParenthesis(opOnStack) && precedes(opOnStack, op)) {
-                valueStack.push(evaluate(operatorStack, valueStack));
+            if (!isParenthesis(opOnStack) && Operators.precedes(opOnStack, op)) {
+                int right = valueStack.pop();
+                int left = valueStack.pop();
+                valueStack.push(evaluate(operatorStack.pop(), left, right));
             }
         }
         operatorStack.push(op);
@@ -109,24 +115,8 @@ public class ShuntingYardExpressionEvaluator implements ExpressionEvaluator {
         return acc * 10 + Character.getNumericValue(digit);
     }
 
-    private int evaluate(Deque<Character> operatorStack, Deque<Integer> valStack) {
-        int right = valStack.pop();
-        int left = valStack.pop();
-        return evaluate(operatorStack.pop(), left, right);
-    }
-
     private int evaluate(char op, int left, int right) {
-        return Operators.fromChar(op).apply(left, right);
-    }
-
-    /**
-     * Returns true if {@code op1} has precedence over {@code op2}.
-     * @param op1 the left operator in the comparison.
-     * @param op2 the right operator in the comparison.
-     * @return true if {@code op1} has precedence over {@code op2}.
-     */
-    private boolean precedes(char op1, char op2) {
-        return Operators.fromChar(op1).compareTo(Operators.fromChar(op2)) > 0;
+        return Operators.apply(op, left, right);
     }
 
     private boolean isParenthesis(char c) {

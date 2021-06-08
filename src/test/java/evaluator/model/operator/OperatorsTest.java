@@ -22,9 +22,4 @@ public class OperatorsTest {
             assertFalse(Operators.isOperator(op));
         });
     }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void testFromChar_invalidChar_throwsException() {
-        Operators.fromChar('$');
-    }
 }
