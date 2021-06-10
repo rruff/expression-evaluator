@@ -1,8 +1,9 @@
 package evaluator.model.operator;
 
-import java.util.HashMap;
+import static java.util.stream.Collectors.toMap;
+
 import java.util.Map;
-import java.util.function.BinaryOperator;
+import java.util.stream.Stream;
 
 import com.google.common.base.Preconditions;
 
@@ -14,7 +15,7 @@ class OrderedIntegerOperator implements OrderedOperator<Integer> {
      * <p>{@link Enum} provides a natural ordering (the order of item declarations)
      * for easy {@link Comparable} implementation.</p>
      */
-    private enum IntOperator implements BinaryOperator<Integer> {
+    private enum IntOperator {
         SUBTRACTION('-') {
             public Integer apply(Integer left, Integer right) {
                 return left - right;
@@ -42,25 +43,23 @@ class OrderedIntegerOperator implements OrderedOperator<Integer> {
             }
         };
 
-        final char op;
+        final char symbol;
         
-        IntOperator(char op) {
-            this. op = op;
+        IntOperator(char symbol) {
+            this. symbol = symbol;
         }
 
-        public char getChar() {
-            return op;
+        public char getSymbol() {
+            return symbol;
         }
 
-        private static final Map<Character, IntOperator> charToOperator = new HashMap<>();
-        static {
-            for (IntOperator operator : values()) {
-                charToOperator.put(operator.op, operator);
-            }
-        }
+        public abstract Integer apply(Integer left, Integer right);
+        
+        private static final Map<Character, IntOperator> CHAR_TO_OPERATOR = Stream.of(values())
+            .collect(toMap(IntOperator::getSymbol, e -> e));
 
         public static IntOperator fromChar(char c) {
-            return charToOperator.get(c);
+            return CHAR_TO_OPERATOR.get(c);
         }
     }
     
@@ -82,7 +81,7 @@ class OrderedIntegerOperator implements OrderedOperator<Integer> {
 
     @Override
     public char getChar() {
-        return intOperator.getChar();
+        return intOperator.getSymbol();
     }
     
 }

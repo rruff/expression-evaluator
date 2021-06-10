@@ -10,9 +10,9 @@ import java.util.function.BinaryOperator;
 public interface OrderedOperator<T> extends BinaryOperator<T>, Comparable<OrderedOperator<T>> {
     
     /**
-     * Returns the character that this operator represent.
+     * Returns the character that this operator represents.
      * 
-     * @return the character that this operator represent.
+     * @return the character that this operator represents.
      */
     char getChar();
 }
